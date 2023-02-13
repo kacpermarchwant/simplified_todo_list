@@ -23,7 +23,6 @@ let parse_search =
   | None -> return []
   | Some _ ->
       sep_by (take_while1 is_whitespace) (take_while is_lowercase_or_dash)
-      >>= fun a -> return a
 
 let parse_expr (line : string) : query =
   match parse_string ~consume:All parse_add line with
