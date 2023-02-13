@@ -1,5 +1,7 @@
 open Core
 
+type Index = int
+
 type query =
   | Add of { description : string }
   | Done of { item_index : int }
