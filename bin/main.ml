@@ -1,6 +1,6 @@
-open Simplified_todo_list.Parser
 open Simplified_todo_list.Types
 open Simplified_todo_list.Todo_list
+open Simplified_todo_list.Parser
 open Core
 
 let execute store input_line : unit =
@@ -11,14 +11,14 @@ let execute store input_line : unit =
   | Done { item_index } ->
       Store.remove store item_index;
       Out_channel.print_endline "Done"
-  | Search { words } -> (
-      match Store.search store words with
+  | Search { searched_phrases } -> (
+      match Store.search store searched_phrases with
       | [||] -> Out_channel.print_endline "No results"
       | results ->
           Array.iter results ~f:(fun item ->
               Out_channel.print_endline
                 (Sexp.to_string (sexp_of_todo_item item))))
-  | Unsupported _ -> print_endline "Unsupported!"
+  | Invalid -> print_endline "Invalid query!"
 
 let rec run store : unit =
   let input_line = In_channel.(input_line_exn stdin) in
