@@ -33,9 +33,5 @@ let parse_expr (line : string) : query =
       | Ok idx -> Done { item_index = int_of_string idx }
       | Error _ -> (
           match parse_string ~consume:Prefix parse_search line with
-          | Ok words ->
-              (* print_endline
-                 (Sexplib.Sexp.to_string
-                    (Base.List.sexp_of_t Base.String.sexp_of_t words)); *)
-              Search { words }
+          | Ok words -> Search { words }
           | Error msg -> Unsupported { msg }))
