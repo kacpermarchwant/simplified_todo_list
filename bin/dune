@@ -1,0 +1,4 @@
+(executable
+ (public_name simplified_todo_list)
+ (name main)
+ (libraries simplified_todo_list core))
