@@ -28,7 +28,7 @@ let parse_search : string list t =
   | Some _ ->
       sep_by (take_while1 is_whitespace) (take_while is_lowercase_or_dash)
 
-let parse_expr (line : string) : query =
+let parse_query (line : string) : query =
   match parse_string ~consume:All parse_add line with
   | Ok desc -> Add { description = Description desc }
   | Error _ -> (

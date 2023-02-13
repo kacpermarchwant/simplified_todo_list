@@ -1,39 +1,19 @@
-open Core
 open Types
 
-type todo_item = {
-  index : index;
-  description : description;
-  mutable is_done : bool;
-}
-[@@deriving sexp]
+type t = { store : Store.t }
 
-module Store = struct
-  type t = { mutable items : todo_item array; mutable next_index : index }
+let add todo_list description : todo_item =
+  let store = todo_list.store in
+  Store.add store description
 
-  let create = { items = [||]; next_index = Index 0 }
+let done_with_item todo_list index : unit =
+  let store = todo_list.store in
+  Store.done_with_item store index
 
-  let add store description : todo_item =
-    let new_item = { index = store.next_index; description; is_done = false } in
-    let (Index i) = new_item.index in
-    store.next_index <- Index (i + 1);
-    store.items <- Array.append store.items [| new_item |];
-    new_item
+let search todo_list searched_phrases : todo_item array =
+  let store = todo_list.store in
+  Store.search store searched_phrases
 
-  let remove store index : unit =
-    let (Index i) = index in
-    if i < Array.length store.items then
-      let item = store.items.(i) in
-      item.is_done <- true
-
-  let search store searched_phrases : todo_item array =
-    let items = store.items in
-    let result =
-      Array.filter items ~f:(fun item ->
-          let (Description desc) = item.description in
-          (not item.is_done)
-          && List.for_all searched_phrases ~f:(fun (Searched_phrase phrase) ->
-                 String.is_substring ~substring:phrase desc))
-    in
-    result
-end
+let create : t =
+  let store = Store.create in
+  { store }

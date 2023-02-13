@@ -10,3 +10,10 @@ type query =
   | Search of { searched_phrases : searched_phrase list }
   | Invalid
 [@@deriving sexp]
+
+type todo_item = {
+  index : index;
+  description : description;
+  mutable is_done : bool;
+}
+[@@deriving sexp]
