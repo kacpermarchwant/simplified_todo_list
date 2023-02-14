@@ -1,8 +1,13 @@
 ## Info
 
-Still WIP. Please come back tommorow for more reasonable solution.
+Plan for today:
+- [] tests 
+- [] clean up (extract functions, remove redundancy, etc.)
+- [] tags 
 
-Interface is the same as in the test task, but it doesn't handle tags (yet)
+## Info
+
+Everything is just like in the test task. 
 
 ## How to run
 
