@@ -1,9 +1,9 @@
-## Info
+## Roadmap
 
 Plan for today:
-- [] tests 
-- [] clean up (extract functions, remove redundancy, etc.)
-- [] tags 
+- tests 
+- clean up (extract functions, remove redundancy, etc.)
+- tags 
 
 ## Info
 
