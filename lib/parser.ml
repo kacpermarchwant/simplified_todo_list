@@ -28,17 +28,18 @@ let parse_search : string list t =
   | Some _ ->
       sep_by (take_while1 is_whitespace) (take_while is_lowercase_or_dash)
 
-let parse_query (line : string) : query =
-  match parse_string ~consume:All parse_add line with
-  | Ok desc -> Add { description = Description desc }
+let parse_query (expr : string) : query =
+  match parse_string ~consume:All parse_add expr with
+  | Ok desc -> Add (Description desc)
   | Error _ -> (
-      match parse_string ~consume:All parse_done line with
-      | Ok idx -> Done { item_index = Index (int_of_string idx) }
+      match parse_string ~consume:All parse_done expr with
+      | Ok idx -> Done (Index (int_of_string idx))
       | Error _ -> (
-          match parse_string ~consume:All parse_search line with
-          | Ok words ->
+          match parse_string ~consume:All parse_search expr with
+          | Ok searched_phrases ->
               let searched_phrases =
-                List.map words ~f:(fun phrase -> Searched_phrase phrase)
+                List.map searched_phrases ~f:(fun phrase ->
+                    Searched_phrase phrase)
               in
-              Search { searched_phrases }
+              Search searched_phrases
           | Error _ -> Invalid))
