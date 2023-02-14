@@ -1,2 +1,3 @@
 (test
- (name simplified_todo_list))
+ (name simplified_todo_list_test)
+ (libraries simplified_todo_list alcotest))
