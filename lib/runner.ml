@@ -17,10 +17,13 @@ let execute_query todo_list query : unit =
           Out_channel.print_endline (Sexp.to_string (sexp_of_todo_item item)))
   | Invalid -> print_endline "Invalid input..."
 
-let rec run todo_list : unit =
-  In_channel.(input_line_exn stdin)
-  |> Parser.parse_query |> execute_query todo_list;
+let rec run todo_list n : unit =
+  if n > 0 then (
+    let query = In_channel.(input_line_exn stdin) in
+    Parser.parse_query query |> execute_query todo_list;
+    run todo_list (n - 1))
+  else Out_channel.print_endline "No more queries available!"
 
-  run todo_list
-
-let start = Todo_list.create () |> run
+let run_n_queries n : unit =
+  let todo_list = Todo_list.create () in
+  run todo_list n

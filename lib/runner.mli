@@ -1,1 +1,1 @@
-val start : unit
+val run_n_queries : int -> unit
