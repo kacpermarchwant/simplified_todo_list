@@ -8,12 +8,12 @@ type t = {
   tags_to_ids : Inverted_index.t;
 }
 
-let create =
+let create () =
   {
     items = [||];
     next_index = Index 0;
-    words_to_ids = Inverted_index.create;
-    tags_to_ids = Inverted_index.create;
+    words_to_ids = Inverted_index.create ();
+    tags_to_ids = Inverted_index.create ();
   }
 
 let all_substrings (s : string) : string list =
@@ -33,15 +33,14 @@ let description_to_words (Description desc) =
 
 let populat_indexes store item : unit =
   let (Index i) = item.index in
-  let desc = item.description in
-  let tags = item.tags in
-  let words = description_to_words desc in
-  List.iter words ~f:(fun word ->
-      all_substrings word
-      |> List.iter ~f:(fun substring ->
-             Inverted_index.add store.words_to_ids substring i));
 
-  List.iter tags ~f:(fun (Tag tag) ->
+  description_to_words item.description
+  |> List.iter ~f:(fun word ->
+         all_substrings word
+         |> List.iter ~f:(fun substring ->
+                Inverted_index.add store.words_to_ids substring i));
+
+  List.iter item.tags ~f:(fun (Tag tag) ->
       all_substrings tag
       |> List.iter ~f:(fun substring ->
              Inverted_index.add store.tags_to_ids substring i))
@@ -95,6 +94,7 @@ let search store words tags : todo_item list =
     in
     let results = item_ids_matching_tags @ item_ids_matching_words in
     let indexes = intersect_sets results in
+
     List.filter_map indexes ~f:(fun index ->
         let item = Array.get items index in
         if item.is_done then None else Some item)

@@ -3,7 +3,7 @@ module Int_set = Hash_set.Make (Int) [@@deriving hash compare sexp]
 
 type t = (string, Int_set.t) Hashtbl.t
 
-let create = Hashtbl.create (module String)
+let create () = Hashtbl.create (module String)
 
 let add (inverted_index : t) (phrase : string) (idx : int) : unit =
   Hashtbl.update inverted_index phrase ~f:(function

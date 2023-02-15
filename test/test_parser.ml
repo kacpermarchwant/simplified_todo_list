@@ -26,25 +26,25 @@ let compare_queries ~result ~expected_result =
     (sexp_of_query expected_result)
     (sexp_of_query result)
 
-let test_parser_does_not_accept_expr_containing_only_whitespace () =
+let does_not_accept_expr_containing_only_whitespace () =
   let expr = " " in
   compare_queries ~result:(Parser.parse_query expr) ~expected_result:Invalid
 
-let test_parser_does_not_accept_expr_starting_with_whitespace () =
+let does_not_accept_expr_starting_with_whitespace () =
   let expr = " search buy milk" in
   compare_queries ~result:(Parser.parse_query expr) ~expected_result:Invalid
 
-let test_parser_add_accepts_string_as_description () =
+let add_accepts_string_as_description () =
   let description = "buy milk" in
   let expr = "add \"" ^ description ^ "\"" in
   compare_queries ~result:(Parser.parse_query expr)
     ~expected_result:(Add { description = Description description; tags = [] })
 
-let test_parser_add_requires_description_to_be_enclosed_in_double_quotes () =
+let add_requires_description_to_be_enclosed_in_double_quotes () =
   let expr = "add \"buy milk" in
   compare_queries ~result:(Parser.parse_query expr) ~expected_result:Invalid
 
-let test_parser_add_requires_description_to_only_contain_lowercase_letters_dashes_and_whitespaces
+let add_requires_description_to_only_contain_lowercase_letters_dashes_and_whitespaces
     () =
   let description = "buy milk -" in
   let valid_expr = "add \"" ^ description ^ "\"" in
@@ -61,23 +61,23 @@ let test_parser_add_requires_description_to_only_contain_lowercase_letters_dashe
     ~result:(Parser.parse_query expr_with_special_character)
     ~expected_result:Invalid
 
-let test_parser_add_ignores_extra_whitespaces_outside_of_the_description () =
+let add_ignores_extra_whitespaces_outside_of_the_description () =
   let description = "buy milk" in
   let expr = "add     \"" ^ description ^ "\"      " in
   compare_queries ~result:(Parser.parse_query expr)
     ~expected_result:(Add { description = Description description; tags = [] })
 
-let test_parser_done_accepts_digit () =
+let done_accepts_digit () =
   let expr = "done 10" in
   compare_queries ~result:(Parser.parse_query expr)
     ~expected_result:(Done (Index 10))
 
-let test_parser_done_ignores_extra_whitespaces () =
+let done_ignores_extra_whitespaces () =
   let expr = "done    10     " in
   compare_queries ~result:(Parser.parse_query expr)
     ~expected_result:(Done (Index 10))
 
-let test_parser_done_accepts_only_digits () =
+let done_accepts_only_digits () =
   let expr_with_letter = "done a" in
   let expr_with_letter_and_digit = "done 1a" in
   let expr_with_special_character = "done !" in
@@ -92,61 +92,59 @@ let test_parser_done_accepts_only_digits () =
     ~result:(Parser.parse_query expr_with_special_character)
     ~expected_result:Invalid
 
-let test_parser_done_does_not_accept_multiple_digits () =
+let done_does_not_accept_multiple_digits () =
   let expr = "done 1 4" in
   compare_queries ~result:(Parser.parse_query expr) ~expected_result:Invalid
 
-let test_parser_search_parses_phrases_correctly () =
+let search_parses_phrases_correctly () =
   let expr = "search buy milk" in
   compare_queries ~result:(Parser.parse_query expr)
     ~expected_result:(Search { words = [ Word "buy"; Word "milk" ]; tags = [] })
 
-let test_parser_search_parses_ignores_extra_whitespaces () =
+let search_parses_ignores_extra_whitespaces () =
   let expr = "search   buy   milk   " in
   compare_queries ~result:(Parser.parse_query expr)
     ~expected_result:(Search { words = [ Word "buy"; Word "milk" ]; tags = [] })
 
-let run =
+let () =
   let open Alcotest in
   run "Parser"
     [
       ( "Parser",
         [
           test_case "Doesn't accept expr containing only whitespace" `Quick
-            test_parser_does_not_accept_expr_containing_only_whitespace;
+            does_not_accept_expr_containing_only_whitespace;
           test_case "Doesn't accept expr starting with whitespace" `Quick
-            test_parser_does_not_accept_expr_starting_with_whitespace;
+            does_not_accept_expr_starting_with_whitespace;
         ] );
       ( "Parser: add",
         [
           test_case "Accepts string as description" `Quick
-            test_parser_add_accepts_string_as_description;
+            add_accepts_string_as_description;
           test_case "Ignores extra whitespaces outside of description" `Quick
-            test_parser_add_ignores_extra_whitespaces_outside_of_the_description;
+            add_ignores_extra_whitespaces_outside_of_the_description;
           test_case "Requires description to be enclosed in double quotes"
-            `Quick
-            test_parser_add_requires_description_to_be_enclosed_in_double_quotes;
+            `Quick add_requires_description_to_be_enclosed_in_double_quotes;
           test_case
             "Requires description to only contain lowercase letters, dashes, \
              and whitespaces"
             `Quick
-            test_parser_add_requires_description_to_only_contain_lowercase_letters_dashes_and_whitespaces;
+            add_requires_description_to_only_contain_lowercase_letters_dashes_and_whitespaces;
         ] );
       ( "Parser: done",
         [
-          test_case "Accepts digit" `Quick test_parser_done_accepts_digit;
+          test_case "Accepts digit" `Quick done_accepts_digit;
           test_case "Ignores extra whitespaces" `Quick
-            test_parser_done_ignores_extra_whitespaces;
-          test_case "Doesn't accept letter" `Quick
-            test_parser_done_accepts_only_digits;
+            done_ignores_extra_whitespaces;
+          test_case "Doesn't accept letter" `Quick done_accepts_only_digits;
           test_case "Accepts only one digit" `Quick
-            test_parser_done_does_not_accept_multiple_digits;
+            done_does_not_accept_multiple_digits;
         ] );
       ( "Parser: search",
         [
           test_case "Parses phrases correctly" `Quick
-            test_parser_search_parses_phrases_correctly;
+            search_parses_phrases_correctly;
           test_case "Ignores extra whitespaces" `Quick
-            test_parser_search_parses_ignores_extra_whitespaces;
+            search_parses_ignores_extra_whitespaces;
         ] );
     ]

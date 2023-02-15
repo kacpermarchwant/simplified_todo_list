@@ -61,6 +61,4 @@ let parse_query (expr : string) : query =
           | Ok search_query ->
               let words, tags = separate_words_from_tags search_query in
               Search { words; tags }
-          | Error e ->
-              Out_channel.print_endline e;
-              Invalid))
+          | Error _ -> Invalid))

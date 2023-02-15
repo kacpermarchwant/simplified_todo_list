@@ -22,6 +22,6 @@ let search todo_list search_params : todo_item list =
   let store = todo_list.store in
   Store.search store search_params.words search_params.tags
 
-let create : t =
-  let store = Store.create in
+let create () : t =
+  let store = Store.create () in
   { store }

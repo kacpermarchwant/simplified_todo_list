@@ -1,3 +1,3 @@
-(test
- (name test_todo_list)
+(tests
+ (names test_parser test_todo_list)
  (libraries simplified_todo_list alcotest))
