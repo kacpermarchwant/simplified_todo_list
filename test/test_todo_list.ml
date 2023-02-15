@@ -1,8 +1,7 @@
 open Simplified_todo_list
 open Simplified_todo_list.Types
 open Core
-
-let testable_sexp = Alcotest.testable Sexp.pp Sexp.equal
+open Common
 
 let compare_search_results ~result ~expected_result =
   let cmp = Poly.compare in
@@ -134,7 +133,7 @@ let () =
   let open Alcotest in
   run "Todo_list"
     [
-      ( "queries",
+      ( "Todo_list",
         [
           test_case "Search words do not query on tags" `Quick
             search_words_do_not_query_on_tags;
