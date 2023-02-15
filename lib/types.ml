@@ -28,6 +28,12 @@ type todo_item = {
 }
 [@@deriving sexp]
 
+module Index = struct
+  type t = index
+
+  let next (Index i) = Index (i + 1)
+end
+
 module Description = struct
   type t = description
 

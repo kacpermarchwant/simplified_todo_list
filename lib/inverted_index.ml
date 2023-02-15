@@ -12,7 +12,7 @@ let add (inverted_index : t) (phrase : string) (idx : int) : unit =
         set
     | None ->
         let set = Hash_set.create (module Int) in
-        ignore (Hashtbl.add inverted_index ~key:phrase ~data:set);
+        let _ = Hashtbl.add inverted_index ~key:phrase ~data:set in
         Hash_set.add set idx;
         set)
 

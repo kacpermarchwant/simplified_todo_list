@@ -8,7 +8,7 @@ let add (todo_list : t) (add_params : add_params) : todo_item =
 
 let done_with_item todo_list index : unit =
   let store = todo_list.store in
-  Store.done_with_item store index
+  Store.delete store index
 
 let search todo_list search_params : todo_item list =
   let store = todo_list.store in

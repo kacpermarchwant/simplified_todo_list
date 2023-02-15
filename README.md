@@ -1,8 +1,3 @@
-## Roadmap
-
-Plan:
-- clean up (extract functions, remove redundancy, etc.)
-
 ## Info
 
 Everything is just like in the test task. 
