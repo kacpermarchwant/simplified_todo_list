@@ -1,9 +1,8 @@
 ## Roadmap
 
 Plan for today:
-- tests 
+- full test coverage with fuzz testing
 - clean up (extract functions, remove redundancy, etc.)
-- tags 
 
 ## Info
 
