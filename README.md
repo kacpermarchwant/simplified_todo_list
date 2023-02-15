@@ -13,5 +13,5 @@ Everything is just like in the test task.
 You can start the application with:
 
 ```bash
-dune exec simplified_todo_list
+dune exec todo_swamp
 ```

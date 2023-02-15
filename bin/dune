@@ -1,4 +1,4 @@
 (executable
- (public_name simplified_todo_list)
+ (public_name todo_swamp)
  (name main)
- (libraries simplified_todo_list core))
+ (libraries todo_swamp core))

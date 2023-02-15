@@ -1,6 +1,6 @@
 (lang dune 3.6)
 
-(name simplified_todo_list)
+(name todo_swamp)
 
 (generate_opam_files true)
 
@@ -16,7 +16,7 @@
 (documentation https://url/to/documentation)
 
 (package
- (name simplified_todo_list)
+ (name todo_swamp)
  (synopsis "A short synopsis")
  (description "A longer description")
  (depends ocaml dune alcotest :with-test)

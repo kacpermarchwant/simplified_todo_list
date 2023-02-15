@@ -1,5 +1,5 @@
 (library
- (name simplified_todo_list)
+ (name todo_swamp)
  (libraries core angstrom)
  (preprocess
   (pps ppx_jane)))
