@@ -27,3 +27,17 @@ type todo_item = {
   mutable is_done : bool;
 }
 [@@deriving sexp]
+
+module Description = struct
+  type t = description
+
+  let to_words (Description desc) =
+    String.split desc ~on:' '
+    |> List.filter ~f:(fun word -> not (String.is_empty word))
+end
+
+module Todo_item = struct
+  type t = todo_item
+
+  let to_output_format { index = Index idx; _ } : string = Int.to_string idx
+end
