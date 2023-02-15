@@ -4,14 +4,16 @@ open Types
 type t = {
   mutable items : todo_item array;
   mutable next_index : index;
-  substrings_to_ids : Inverted_index.t;
+  words_to_ids : Inverted_index.t;
+  tags_to_ids : Inverted_index.t;
 }
 
 let create =
   {
     items = [||];
     next_index = Index 0;
-    substrings_to_ids = Inverted_index.create;
+    words_to_ids = Inverted_index.create;
+    tags_to_ids = Inverted_index.create;
   }
 
 let all_substrings (s : string) : string list =
@@ -25,21 +27,34 @@ let all_substrings (s : string) : string list =
   done;
   !substrings
 
-let add store description : todo_item =
-  let substrings_to_ids = store.substrings_to_ids in
-  let new_item = { index = store.next_index; description; is_done = false } in
-  let (Index i) = new_item.index in
-  let (Description desc) = description in
-
+let description_to_words (Description desc) =
   String.split desc ~on:' '
   |> List.filter ~f:(fun word -> not (String.is_empty word))
-  |> List.iter ~f:(fun word ->
-         all_substrings word
-         |> List.iter ~f:(fun substring ->
-                Inverted_index.add substrings_to_ids substring i));
 
-  store.next_index <- Index (i + 1);
+let populat_indexes store item : unit =
+  let (Index i) = item.index in
+  let desc = item.description in
+  let tags = item.tags in
+  let words = description_to_words desc in
+  List.iter words ~f:(fun word ->
+      all_substrings word
+      |> List.iter ~f:(fun substring ->
+             Inverted_index.add store.words_to_ids substring i));
+
+  List.iter tags ~f:(fun (Tag tag) ->
+      all_substrings tag
+      |> List.iter ~f:(fun substring ->
+             Inverted_index.add store.tags_to_ids substring i))
+
+let add store description tags : todo_item =
+  let (Index new_item_index) = store.next_index in
+  let new_item =
+    { index = Index new_item_index; description; tags; is_done = false }
+  in
+
+  store.next_index <- Index (new_item_index + 1);
   store.items <- Array.append store.items [| new_item |];
+  populat_indexes store new_item;
 
   new_item
 
@@ -61,18 +76,24 @@ let intersect_sets sets : 'a list =
           List.for_all tail ~f:(fun set -> Hash_set.mem set el))
       |> Hash_set.to_list
 
-let search store searched_phrases : todo_item list =
+let search store words tags : todo_item list =
   let items = store.items in
-  if List.is_empty searched_phrases then
+  if List.is_empty words && List.is_empty tags then
     Array.filter items ~f:(fun item -> not item.is_done) |> Array.to_list
   else
-    let substrings_to_ids = store.substrings_to_ids in
-    let results =
+    let item_ids_matching_words =
       List.fold_left ~init:[]
-        ~f:(fun acc (Searched_phrase phrase) ->
-          Inverted_index.get substrings_to_ids phrase :: acc)
-        searched_phrases
+        ~f:(fun acc (Word word) ->
+          Inverted_index.get store.words_to_ids word :: acc)
+        words
     in
+    let item_ids_matching_tags =
+      List.fold_left ~init:[]
+        ~f:(fun acc (Tag tag) ->
+          Inverted_index.get store.tags_to_ids tag :: acc)
+        tags
+    in
+    let results = item_ids_matching_tags @ item_ids_matching_words in
     let indexes = intersect_sets results in
     List.filter_map indexes ~f:(fun index ->
         let item = Array.get items index in

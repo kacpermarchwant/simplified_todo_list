@@ -4,7 +4,23 @@ open Core
 
 let testable_sexp = Alcotest.testable Sexp.pp Sexp.equal
 
-let compare_results ~result ~expected_result =
+let serialize_result (res : query) : query =
+  match res with
+  | Add add_params ->
+      Add
+        {
+          add_params with
+          tags = List.sort add_params.tags ~compare:Poly.compare;
+        }
+  | Search search_params ->
+      let sorted_words = List.sort search_params.words ~compare:Poly.compare in
+      let sorted_tags = List.sort search_params.tags ~compare:Poly.compare in
+      Search { words = sorted_words; tags = sorted_tags }
+  | q -> q
+
+let compare_queries ~result ~expected_result =
+  let result = serialize_result result in
+  let expected_result = serialize_result expected_result in
   Alcotest.(check testable_sexp)
     "result = expected result"
     (sexp_of_query expected_result)
@@ -12,21 +28,21 @@ let compare_results ~result ~expected_result =
 
 let test_parser_does_not_accept_expr_containing_only_whitespace () =
   let expr = " " in
-  compare_results ~result:(Parser.parse_query expr) ~expected_result:Invalid
+  compare_queries ~result:(Parser.parse_query expr) ~expected_result:Invalid
 
 let test_parser_does_not_accept_expr_starting_with_whitespace () =
   let expr = " search buy milk" in
-  compare_results ~result:(Parser.parse_query expr) ~expected_result:Invalid
+  compare_queries ~result:(Parser.parse_query expr) ~expected_result:Invalid
 
 let test_parser_add_accepts_string_as_description () =
   let description = "buy milk" in
   let expr = "add \"" ^ description ^ "\"" in
-  compare_results ~result:(Parser.parse_query expr)
-    ~expected_result:(Add (Description description))
+  compare_queries ~result:(Parser.parse_query expr)
+    ~expected_result:(Add { description = Description description; tags = [] })
 
 let test_parser_add_requires_description_to_be_enclosed_in_double_quotes () =
   let expr = "add \"buy milk" in
-  compare_results ~result:(Parser.parse_query expr) ~expected_result:Invalid
+  compare_queries ~result:(Parser.parse_query expr) ~expected_result:Invalid
 
 let test_parser_add_requires_description_to_only_contain_lowercase_letters_dashes_and_whitespaces
     () =
@@ -35,30 +51,30 @@ let test_parser_add_requires_description_to_only_contain_lowercase_letters_dashe
   let expr_with_capitalized_letter = "add \"" ^ "B" ^ "\"" in
   let expr_with_special_character = "add \"" ^ "!" ^ "\"" in
 
-  compare_results
+  compare_queries
     ~result:(Parser.parse_query valid_expr)
-    ~expected_result:(Add (Description description));
-  compare_results
+    ~expected_result:(Add { description = Description description; tags = [] });
+  compare_queries
     ~result:(Parser.parse_query expr_with_capitalized_letter)
     ~expected_result:Invalid;
-  compare_results
+  compare_queries
     ~result:(Parser.parse_query expr_with_special_character)
     ~expected_result:Invalid
 
 let test_parser_add_ignores_extra_whitespaces_outside_of_the_description () =
   let description = "buy milk" in
   let expr = "add     \"" ^ description ^ "\"      " in
-  compare_results ~result:(Parser.parse_query expr)
-    ~expected_result:(Add (Description description))
+  compare_queries ~result:(Parser.parse_query expr)
+    ~expected_result:(Add { description = Description description; tags = [] })
 
 let test_parser_done_accepts_digit () =
   let expr = "done 10" in
-  compare_results ~result:(Parser.parse_query expr)
+  compare_queries ~result:(Parser.parse_query expr)
     ~expected_result:(Done (Index 10))
 
 let test_parser_done_ignores_extra_whitespaces () =
   let expr = "done    10     " in
-  compare_results ~result:(Parser.parse_query expr)
+  compare_queries ~result:(Parser.parse_query expr)
     ~expected_result:(Done (Index 10))
 
 let test_parser_done_accepts_only_digits () =
@@ -66,31 +82,29 @@ let test_parser_done_accepts_only_digits () =
   let expr_with_letter_and_digit = "done 1a" in
   let expr_with_special_character = "done !" in
 
-  compare_results
+  compare_queries
     ~result:(Parser.parse_query expr_with_letter)
     ~expected_result:Invalid;
-  compare_results
+  compare_queries
     ~result:(Parser.parse_query expr_with_letter_and_digit)
     ~expected_result:Invalid;
-  compare_results
+  compare_queries
     ~result:(Parser.parse_query expr_with_special_character)
     ~expected_result:Invalid
 
 let test_parser_done_does_not_accept_multiple_digits () =
   let expr = "done 1 4" in
-  compare_results ~result:(Parser.parse_query expr) ~expected_result:Invalid
+  compare_queries ~result:(Parser.parse_query expr) ~expected_result:Invalid
 
 let test_parser_search_parses_phrases_correctly () =
   let expr = "search buy milk" in
-  compare_results ~result:(Parser.parse_query expr)
-    ~expected_result:
-      (Search { words = [ Subsequence "buy"; Subsequence "milk" ]; tags = [] })
+  compare_queries ~result:(Parser.parse_query expr)
+    ~expected_result:(Search { words = [ Word "buy"; Word "milk" ]; tags = [] })
 
 let test_parser_search_parses_ignores_extra_whitespaces () =
   let expr = "search   buy   milk   " in
-  compare_results ~result:(Parser.parse_query expr)
-    ~expected_result:
-      (Search { words = [ Subsequence "buy"; Subsequence "milk" ]; tags = [] })
+  compare_queries ~result:(Parser.parse_query expr)
+    ~expected_result:(Search { words = [ Word "buy"; Word "milk" ]; tags = [] })
 
 let run =
   let open Alcotest in
