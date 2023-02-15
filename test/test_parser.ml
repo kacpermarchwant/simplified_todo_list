@@ -104,17 +104,20 @@ let search_parses_no_params_correctly () =
 let search_parses_search_words_correctly () =
   let expr = "search buy milk" in
   compare_queries ~result:(Parser.parse_query expr)
-    ~expected_result:(Search { words = [ Word "buy"; Word "milk" ]; tags = [] })
+    ~expected_result:
+      (Search { words = [ SearchWord "buy"; SearchWord "milk" ]; tags = [] })
 
 let search_parses_search_tags_correctly () =
   let expr = "search #buy #milk" in
   compare_queries ~result:(Parser.parse_query expr)
-    ~expected_result:(Search { words = []; tags = [ Tag "buy"; Tag "milk" ] })
+    ~expected_result:
+      (Search { words = []; tags = [ SearchTag "buy"; SearchTag "milk" ] })
 
 let search_parses_ignores_extra_whitespaces () =
   let expr = "search   buy   milk   " in
   compare_queries ~result:(Parser.parse_query expr)
-    ~expected_result:(Search { words = [ Word "buy"; Word "milk" ]; tags = [] })
+    ~expected_result:
+      (Search { words = [ SearchWord "buy"; SearchWord "milk" ]; tags = [] })
 
 let search_tags_have_to_be_separated_by_whitespace () =
   let invalid_expr = "search #buy#milk" in
@@ -124,7 +127,8 @@ let search_tags_have_to_be_separated_by_whitespace () =
     ~expected_result:Invalid;
   compare_queries
     ~result:(Parser.parse_query valid_expr)
-    ~expected_result:(Search { words = []; tags = [ Tag "buy"; Tag "milk" ] })
+    ~expected_result:
+      (Search { words = []; tags = [ SearchTag "buy"; SearchTag "milk" ] })
 
 let search_tags_and_search_words_can_be_parsed_alternately () =
   let expr = "search buy #today milk #groceries" in
@@ -132,8 +136,8 @@ let search_tags_and_search_words_can_be_parsed_alternately () =
     ~expected_result:
       (Search
          {
-           words = [ Word "buy"; Word "milk" ];
-           tags = [ Tag "today"; Tag "groceries" ];
+           words = [ SearchWord "buy"; SearchWord "milk" ];
+           tags = [ SearchTag "today"; SearchTag "groceries" ];
          })
 
 let () =

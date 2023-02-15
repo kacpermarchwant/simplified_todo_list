@@ -2,9 +2,9 @@ open Core
 open Angstrom
 open Types
 
-type search_expr_element = WordEl of word | TagEl of tag
+type search_expr_element = WordEl of search_word | TagEl of search_tag
 
-let separate_words_from_tags search_query : word list * tag list =
+let separate_words_from_tags search_query : search_word list * search_tag list =
   List.fold_left search_query ~init:([], []) ~f:(fun (words, tags) el ->
       match el with
       | WordEl word -> (word :: words, tags)
@@ -46,8 +46,8 @@ let parse_search : search_expr_element list t =
   *> many
        (satisfy is_whitespace *> skip_while is_whitespace
        *> (take_tag
-          >>| (fun tag -> TagEl (Tag tag))
-          <|> (take_word >>| fun word -> WordEl (Word word))))
+          >>| (fun tag -> TagEl (SearchTag tag))
+          <|> (take_word >>| fun word -> WordEl (SearchWord word))))
   <* skip_while is_whitespace
 
 let parse_query (expr : string) : query =

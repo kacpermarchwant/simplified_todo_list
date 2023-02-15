@@ -75,22 +75,22 @@ let intersect_sets sets : 'a list =
           List.for_all tail ~f:(fun set -> Hash_set.mem set el))
       |> Hash_set.to_list
 
-let search store words tags : todo_item list =
+let search store search_words search_tags : todo_item list =
   let items = store.items in
-  if List.is_empty words && List.is_empty tags then
+  if List.is_empty search_words && List.is_empty search_tags then
     Array.filter items ~f:(fun item -> not item.is_done) |> Array.to_list
   else
     let item_ids_matching_words =
       List.fold_left ~init:[]
-        ~f:(fun acc (Word word) ->
+        ~f:(fun acc (SearchWord word) ->
           Inverted_index.get store.words_to_ids word :: acc)
-        words
+        search_words
     in
     let item_ids_matching_tags =
       List.fold_left ~init:[]
-        ~f:(fun acc (Tag tag) ->
+        ~f:(fun acc (SearchTag tag) ->
           Inverted_index.get store.tags_to_ids tag :: acc)
-        tags
+        search_tags
     in
     let results = item_ids_matching_tags @ item_ids_matching_words in
     let indexes = intersect_sets results in

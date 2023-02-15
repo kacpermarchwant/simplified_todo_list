@@ -22,7 +22,7 @@ let search_words_do_not_query_on_tags () =
     Todo_list.add todo_list
       { description = Description "groceries"; tags = [ Tag "bread" ] }
   in
-  let search_params = { words = [ Word "bread" ]; tags = [] } in
+  let search_params = { words = [ SearchWord "bread" ]; tags = [] } in
   compare_search_results
     ~result:(Todo_list.search todo_list search_params)
     ~expected_result:[ item ]
@@ -37,7 +37,7 @@ let search_tags_do_not_query_on_words () =
     Todo_list.add todo_list
       { description = Description "groceries"; tags = [ Tag "bread" ] }
   in
-  let search_params = { words = []; tags = [ Tag "groceries" ] } in
+  let search_params = { words = []; tags = [ SearchTag "groceries" ] } in
   compare_search_results
     ~result:(Todo_list.search todo_list search_params)
     ~expected_result:[ item ]
@@ -50,7 +50,7 @@ let queries_whole_words_properly () =
   let _ =
     Todo_list.add todo_list { description = Description "bu bread"; tags = [] }
   in
-  let search_params = { words = [ Word "buy" ]; tags = [] } in
+  let search_params = { words = [ SearchWord "buy" ]; tags = [] } in
   compare_search_results
     ~result:(Todo_list.search todo_list search_params)
     ~expected_result:[ item ]
@@ -69,7 +69,7 @@ let queries_whole_tags_properly () =
     Todo_list.add todo_list
       { description = Description "call parents"; tags = [ Tag "relatives" ] }
   in
-  let search_params = { words = []; tags = [ Tag "groceries" ] } in
+  let search_params = { words = []; tags = [ SearchTag "groceries" ] } in
   compare_search_results
     ~result:(Todo_list.search todo_list search_params)
     ~expected_result:[ item1; item2 ]
@@ -81,7 +81,7 @@ let queries_subsequences_properly () =
       { description = Description "buy milk"; tags = [ Tag "bread" ] }
   in
   let search_params =
-    { words = [ Word "il"; Word "b" ]; tags = [ Tag "ea" ] }
+    { words = [ SearchWord "il"; SearchWord "b" ]; tags = [ SearchTag "ea" ] }
   in
   compare_search_results
     ~result:(Todo_list.search todo_list search_params)
@@ -107,7 +107,9 @@ let queries_only_items_that_match_all_search_words_and_all_search_tags () =
         tags = [ Tag "relatives"; Tag "today" ];
       }
   in
-  let search_params = { words = [ Word "buy" ]; tags = [ Tag "day" ] } in
+  let search_params =
+    { words = [ SearchWord "buy" ]; tags = [ SearchTag "day" ] }
+  in
   compare_search_results
     ~result:(Todo_list.search todo_list search_params)
     ~expected_result:[ item ]
@@ -123,7 +125,7 @@ let given_empty_search_params_returns_all_items_that_are_not_done () =
   let item3 =
     Todo_list.add todo_list { description = Description "buy bread"; tags = [] }
   in
-  let search_params = { words = [ Word "bread" ]; tags = [] } in
+  let search_params = { words = [ SearchWord "bread" ]; tags = [] } in
   Todo_list.done_with_item todo_list item2.index;
   compare_search_results
     ~result:(Todo_list.search todo_list search_params)
