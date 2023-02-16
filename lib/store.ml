@@ -75,8 +75,7 @@ let add store description tags : todo_item =
   let new_item =
     { index = store.next_index; description; tags; is_done = false }
   in
-
-  store.next_index <- Index.next store.next_index;
+  store.next_index <- Index.next new_item.index;
   store.items <- Array.append store.items [| new_item |];
   populate_inverted_indexes store new_item;
 
@@ -97,11 +96,9 @@ let search store search_words search_tags : todo_item list =
       get_indexes_matching_words store search_words
     in
     let indexes_matching_tags = get_indexes_matching_tags store search_tags in
-
     let matching_indexes =
       intersect_sets (indexes_matching_tags @ indexes_matching_words)
     in
-
     List.filter_map matching_indexes ~f:(fun index ->
         let item = Array.get store.items index in
         if item.is_done then None else Some item)
