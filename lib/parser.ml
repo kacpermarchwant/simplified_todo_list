@@ -13,8 +13,7 @@ let separate_words_from_tags search_query : search_word list * search_tag list =
       | WordEl word -> (word :: words, tags)
       | TagEl tag -> (words, tag :: tags))
 
-let is_whitespace (c : char) : bool =
-  match c with ' ' | '\t' -> true | _ -> false
+let is_whitespace (c : char) : bool = Char.is_whitespace c
 
 let is_lowercase_or_dash (c : char) : bool =
   Char.is_lowercase c || Char.equal c '-'
